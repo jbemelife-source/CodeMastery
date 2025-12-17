@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeMastery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="main.css">
+</head>
+
+<body class="bg-gray-50 text-gray-900 font-sans">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50" id="nav">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between py-4">
+                <div class="flex items-center space-x-8">
+                    <h2 class="text-2xl font-bold text-purple-600 cursor-pointer" onclick="showSection('home')">
+                        CodeMastery</h2>
+                    <a href="#" class="text-lg hover:text-purple-600" onclick="showSection('home')">Courses</a>
+                    <a href="#" class="text-lg hover:text-purple-600" onclick="showSection('dashboard')">Dashboard</a>
+                    <a href="#" class="text-lg hover:text-purple-600">Pricing</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="relative p-2" onclick="showSection('dashboard')">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span id="cartBadge"
+                            class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center hidden">0</span>
+                    </button>
+                    <button id="loginBtn" class="bg-purple-600 text-white px-6 py-2 rounded-full hover:bg-purple-700"
+                        onclick="toggleAuthModal()">Login</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Sections -->
+    <main>
+        <!-- Home / Courses Page -->
+        <section id="home" class="min-h-screen">
+            <!-- Hero -->
+            <section class="hero-gradient text-white py-20">
+                <div class="container mx-auto px-4 text-center">
+                    <h1 class="text-5xl md:text-7xl font-bold mb-6">Master Coding Today</h1>
+                    <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">Python, PHP, JavaScript courses with PDFs +
+                        Videos. Lifetime access.</p>
+                    <div class="max-w-2xl mx-auto flex flex-col sm:flex-row gap-4 mb-12">
+                        <input id="searchInput" type="text" placeholder="Search Python, PHP, JavaScript..."
+                            class="flex-1 px-6 py-4 text-lg rounded-full focus:outline-none focus:ring-4 ring-white/30">
+                        <button onclick="searchCourses()"
+                            class="bg-white text-purple-600 px-8 py-4 text-lg font-semibold rounded-full hover:bg-gray-100">Search</button>
+                    </div>
+                    <div class="flex flex-wrap justify-center gap-4 mb-8">
+                        <span class="bg-white/20 px-4 py-2 rounded-full cursor-pointer hover:bg-white/30"
+                            onclick="filterByLang('Python')">Python</span>
+                        <span class="bg-white/20 px-4 py-2 rounded-full cursor-pointer hover:bg-white/30"
+                            onclick="filterByLang('PHP')">PHP</span>
+                        <span class="bg-white/20 px-4 py-2 rounded-full cursor-pointer hover:bg-white/30"
+                            onclick="filterByLang('JavaScript')">JavaScript</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Filters & Courses -->
+            <div class="container mx-auto px-4 py-12">
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <div class="lg:w-1/4 space-y-4">
+                        <h3 class="font-bold text-xl mb-4">Filters</h3>
+                        <div>
+                            <h4 class="font-semibold mb-2">Language</h4>
+                            <label class="flex items-center space-x-2 mb-2 cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 filter-lang" value="Python"
+                                    onchange="filterCourses()"> Python
+                            </label>
+                            <label class="flex items-center space-x-2 mb-2 cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 filter-lang" value="PHP"
+                                    onchange="filterCourses()"> PHP
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 filter-lang" value="JavaScript"
+                                    onchange="filterCourses()"> JavaScript
+                            </label>
+                        </div>
+                    </div>
+                    <div class="lg:w-3/4">
+                        <div id="courseGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <!-- Courses populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard -->
+        <section id="dashboard" class="min-h-screen bg-gray-100 py-20 hidden">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-16">
+                    <h1 class="text-5xl font-bold text-gray-800 mb-4">My Courses</h1>
+                    <p class="text-xl text-gray-600">Track your progress and download materials</p>
+                </div>
+                <div id="myCoursesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Course Detail Modal -->
+    <div id="courseModal"
+        class="fixed inset-0 bg-black/70 z-50 hidden modal-overlay flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto modal-enter">
+            <div class="relative">
+                <button onclick="closeCourseModal()"
+                    class="absolute -top-4 -right-4 bg-red-500 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl z-10">×</button>
+                <div id="modalVideo"
+                    class="h-64 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center rounded-t-3xl">
+                    <i class="fas fa-play-circle text-6xl text-white/80"></i>
+                </div>
+                <div class="p-8">
+                    <h2 id="modalTitle" class="text-3xl font-bold mb-4"></h2>
+                    <div class="flex items-center space-x-2 text-yellow-400 mb-6">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                        <span id="modalRating" class="ml-1"></span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div>
+                            <h3 class="font-bold text-lg mb-3">What you'll learn</h3>
+                            <ul id="modalCurriculum" class="space-y-2 text-gray-600"></ul>
+                        </div>
+                        <div>
+                            <div class="bg-green-50 p-6 rounded-2xl mb-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <span class="text-3xl font-bold text-green-600" id="modalPrice"></span>
+                                    <span class="text-lg text-gray-400 line-through" id="modalOldPrice"></span>
+                                </div>
+                                <button id="modalBuyBtn"
+                                    class="w-full bg-purple-600 text-white py-4 px-6 rounded-2xl text-lg font-bold hover:bg-purple-700 flex items-center justify-center">
+                                    <i class="fas fa-shopping-cart mr-2"></i>Buy Now
+                                </button>
+                                <p class="text-xs text-green-600 mt-2 text-center">30-day money back guarantee</p>
+                            </div>
+                            <button onclick="addToCartModal()"
+                                class="w-full bg-gray-100 text-gray-800 py-3 px-6 rounded-xl hover:bg-gray-200 flex items-center justify-center">
+                                <i class="fas fa-plus mr-2"></i>Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl mb-4">Reviews</h3>
+                        <div class="flex space-x-4 text-sm text-gray-500">
+                            <span>4.9 ★</span>
+                            <span>1,247 ratings</span>
+                            <span>50K students</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8">
+            <div class="flex justify-between items-center mb-8">
+                <h2 id="authTitle" class="text-3xl font-bold">Login</h2>
+                <button onclick="toggleAuthModal()" class="text-2xl">×</button>
+            </div>
+            <div id="authTabs">
+                <div class="flex mb-6">
+                    <button class="flex-1 py-3 font-semibold border-b-2 border-purple-600"
+                        onclick="switchAuth('login')">Login</button>
+                    <button class="flex-1 py-3 font-semibold" onclick="switchAuth('signup')">Sign Up</button>
+                </div>
+                <form id="authForm">
+                    <input type="email" id="authEmail" placeholder="Email"
+                        class="w-full p-4 border rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <input type="password" id="authPassword" placeholder="Password"
+                        class="w-full p-4 border rounded-xl mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <button type="submit" id="authSubmit"
+                        class="w-full bg-purple-600 text-white py-4 px-6 rounded-xl text-lg font-bold hover:bg-purple-700">Login</button>
+                </form>
+                <p class="text-center text-sm text-gray-500 mt-4">Demo: jb@example.com / password123</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-8">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold">Checkout</h2>
+                <button onclick="closeCheckout()" class="text-2xl">×</button>
+            </div>
+            <div id="checkoutItems"></div>
+            <div class="border-t pt-6 mt-6">
+                <div class="flex justify-between text-xl font-bold mb-6">
+                    <span>Total:</span>
+                    <span id="checkoutTotal">$0</span>
+                </div>
+                <button onclick="completePurchase()"
+                    class="w-full bg-green-600 text-white py-4 px-6 rounded-xl text-lg font-bold hover:bg-green-700">
+                    <i class="fas fa-credit-card mr-2"></i>Pay Securely
+                </button>
+                <p class="text-xs text-green-600 mt-2 text-center">Powered by Nexus jb • Secure Payments</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="web.js">
+    </script>
+</body>
+
+</html>
